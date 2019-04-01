@@ -1,4 +1,5 @@
 <?php
+$bcc_pmd_contacts = false; // sends a BCC to PMD contacts
 
 $organization = DonationManager::get_default_organization();
 $org_id = $organization[0]['id'];
@@ -54,6 +55,7 @@ add_filter( 'wp_mail_from_name', 'followup_email_set_mail_from_name' );
 $donations_query = new WP_Query( $args );
 $row = 0;
 $table_rows = [];
+$headers = []; // email headers
 while( $donations_query->have_posts() ){
   $donations_query->the_post();
   $post_id = get_the_ID();
@@ -70,13 +72,16 @@ while( $donations_query->have_posts() ){
   $followup_email_sent = get_post_meta( $post_id, 'followup_email_sent', true );
   $table_rows[$row]['followup_email_sent'] = $followup_email_sent;
 
+  if( $bcc_pmd_contacts )
+    $headers[] = 'Bcc:contact@pickupmydonation.com';
+
   //*
   if( ! $followup_email_sent ){
     $message = file_get_contents( dirname( __FILE__ ) . '/follow-up-email.html' );
     $search = ['{donor_name}'];
     $replace = [$donor_name];
     $message = str_replace( $search, $replace, $message );
-    wp_mail( $donor_email, 'Update on Your Donation Status - PickUpMyDonation.com', $message, ['Bcc:contact@pickupmydonation.com'] );
+    wp_mail( $donor_email, 'Update on Your Donation Status - PickUpMyDonation.com', $message, $headers );
     update_post_meta( $post_id, 'followup_email_sent', true );
   }
   /**/
