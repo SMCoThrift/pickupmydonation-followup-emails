@@ -1,8 +1,8 @@
 <?php
 $bcc_pmd_contacts = false; // sends a BCC to PMD contacts
 
-$organization = DonationManager::get_default_organization();
-$org_id = $organization[0]['id'];
+$organization = DonationManager\organizations\get_default_organization();
+$org_id = $organization['id'];
 
 $args = [
   'post_type'       => 'donation',
@@ -81,7 +81,21 @@ while( $donations_query->have_posts() ){
     $search = ['{donor_name}'];
     $replace = [$donor_name];
     $message = str_replace( $search, $replace, $message );
-    wp_mail( $donor_email, 'Update on Your Donation Status - PickUpMyDonation.com', $message, $headers );
+
+    $subject = 'Update on Your Donation Status - PickUpMyDonation.com';
+    /**
+     * MailHog miss-encodes the subject line (i.e. you get "=?us-ascii?Q?" with no
+     * subject showing). Reducing the strlen below 40 chars so we see it during
+     * local development.
+     *
+     * Ref: https://github.com/mailhog/MailHog/issues/282
+     */
+    if( DONMAN_DEV_ENV ){
+      if( 40 < strlen( $subject ) )
+        $subject = substr( $subject, 0, 37 ) . '...';
+    }
+
+    wp_mail( $donor_email, $subject, $message, $headers );
     update_post_meta( $post_id, 'followup_email_sent', true );
   }
   /**/
