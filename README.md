@@ -1,6 +1,6 @@
 # PickUpMyDonation.com Followup Emails
 **Contributors:** [thewebist](https://profiles.wordpress.org/thewebist/)
-**Stable tag:** 1.0.0
+**Stable tag:** 2.0.0
 **License:** GPLv2 or later
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,6 +15,9 @@ Setup a cron to run this script like so:
 ```
 
 ## Changelog
+
+### 2.0.0
+* PMD 3.0 compatibility.
 
 ### 1.0.0
 * Initial release.
